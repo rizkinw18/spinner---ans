@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Spinner Wheel ANS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body {
+  font-family: Arial, sans-serif;
+  text-align: center;
+  background: #111;
+  color: #fff;
+}
+
+.container {
+  margin-top: 30px;
+}
+
+#wheel {
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  margin: auto;
+  border: 8px solid #fff;
+  transition: transform 4s ease-out;
+  background: conic-gradient(
+    #ff4d4d 0deg 120deg,
+    #f9ca24 120deg 240deg,
+    #6ab04c 240deg 360deg
+  );
+}
+
+.pointer {
+  width: 0;
+  height: 0;
+  border-left: 15px solid transparent;
+  border-right: 15px solid transparent;
+  border-bottom: 25px solid red;
+  margin: 10px auto;
+}
+
+button {
+  margin-top: 20px;
+  padding: 12px 25px;
+  font-size: 18px;
+  border: none;
+  border-radius: 8px;
+  background: #ff4d4d;
+  color: #fff;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #e84118;
+}
+
+#result {
+  margin-top: 20px;
+  font-size: 20px;
+  font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+  <h2>🎉 SPINNER HADIAH ANS 🎉</h2>
+
+  <div class="pointer"></div>
+  <div id="wheel"></div>
+
+  <button onclick="spin()">SPIN SEKARANG</button>
+
+  <div id="result"></div>
+</div>
+
+<script>
+let angle = 0;
+const hadiah = [
+  "🎁 Treatment Kit",
+  "🛞 Semir Ban",
+  "🎒 Merchpack ANS"
+];
+
+function spin() {
+  const spinAngle = Math.floor(Math.random() * 360) + 1080;
+  angle += spinAngle;
+
+  document.getElementById("wheel").style.transform =
+    `rotate(${angle}deg)`;
+
+  setTimeout(() => {
+    const actualAngle = angle % 360;
+    let index;
+
+    if (actualAngle < 120) index = 0;
+    else if (actualAngle < 240) index = 1;
+    else index = 2;
+
+    document.getElementById("result").innerText =
+      "Kamu mendapatkan: " + hadiah[index];
+  }, 4000);
+}
+</script>
+
+</body>
+</html>
