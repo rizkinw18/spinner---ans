@@ -1,108 +1,119 @@
 ﻿<!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<title>Spinner Wheel ANS</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-body {
-  font-family: Arial, sans-serif;
-  text-align: center;
-  background: #111;
-  color: #fff;
-}
-
-.container {
-  margin-top: 30px;
-}
-
-#wheel {
-  width: 300px;
-  height: 300px;
-  border-radius: 50%;
-  margin: auto;
-  border: 8px solid #fff;
-  transition: transform 4s ease-out;
-  background: conic-gradient(
-    #ff4d4d 0deg 120deg,
-    #f9ca24 120deg 240deg,
-    #6ab04c 240deg 360deg
-  );
-}
-
-.pointer {
-  width: 0;
-  height: 0;
-  border-left: 15px solid transparent;
-  border-right: 15px solid transparent;
-  border-bottom: 25px solid red;
-  margin: 10px auto;
-}
-
-button {
-  margin-top: 20px;
-  padding: 12px 25px;
-  font-size: 18px;
-  border: none;
-  border-radius: 8px;
-  background: #ff4d4d;
-  color: #fff;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #e84118;
-}
-
-#result {
-  margin-top: 20px;
-  font-size: 20px;
-  font-weight: bold;
-}
-</style>
+  <meta charset="UTF-8" />
+  <title>Spinner Hadiah ANS</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <style>
+    body {
+      background: #0f0f0f;
+      color: white;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 10px;
+    }
+    canvas {
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 30px;
+      font-size: 16px;
+      background: #ff5722;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
-  <h2>🎉 SPINNER HADIAH ANS 🎉</h2>
 
-  <div class="pointer"></div>
-  <div id="wheel"></div>
+<h1>🎉 SPINNER HADIAH ANS 🎉</h1>
 
-  <button onclick="spin()">SPIN SEKARANG</button>
+<canvas id="wheel" width="300" height="300"></canvas>
 
-  <div id="result"></div>
-</div>
+<br/>
+<button onclick="spin()">SPIN SEKARANG</button>
+
+<div id="result"></div>
 
 <script>
-let angle = 0;
-const hadiah = [
-  "🎁 Treatment Kit",
-  "🛞 Semir Ban",
-  "🎒 Merchpack ANS"
+const segments = [
+  { text: "Treatment Kit", color: "#4CAF50" },
+  { text: "Semir Ban", color: "#2196F3" },
+  { text: "Merchpack ANS", color: "#FF9800" }
 ];
 
-function spin() {
-  const spinAngle = Math.floor(Math.random() * 360) + 1080;
-  angle += spinAngle;
+const canvas = document.getElementById("wheel");
+const ctx = canvas.getContext("2d");
+const center = canvas.width / 2;
+const radius = canvas.width / 2;
+const slice = (2 * Math.PI) / segments.length;
+let rotation = 0;
 
-  document.getElementById("wheel").style.transform =
-    `rotate(${angle}deg)`;
+function drawWheel() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-  setTimeout(() => {
-    const actualAngle = angle % 360;
-    let index;
+  segments.forEach((seg, i) => {
+    const start = rotation + i * slice;
+    const end = start + slice;
 
-    if (actualAngle < 120) index = 0;
-    else if (actualAngle < 240) index = 1;
-    else index = 2;
+    ctx.beginPath();
+    ctx.moveTo(center, center);
+    ctx.arc(center, center, radius, start, end);
+    ctx.fillStyle = seg.color;
+    ctx.fill();
 
-    document.getElementById("result").innerText =
-      "Kamu mendapatkan: " + hadiah[index];
-  }, 4000);
+    ctx.save();
+    ctx.translate(center, center);
+    ctx.rotate(start + slice / 2);
+    ctx.textAlign = "right";
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText(seg.text, radius - 15, 5);
+    ctx.restore();
+  });
 }
+
+function spin() {
+  const randomSpin = Math.random() * 360 + 720;
+  let start = rotation * 180 / Math.PI;
+  let end = start + randomSpin;
+  let duration = 3000;
+  let startTime = null;
+
+  function animate(time) {
+    if (!startTime) startTime = time;
+    let progress = time - startTime;
+    let angle = start + (end - start) * (progress / duration);
+
+    rotation = angle * Math.PI / 180;
+    drawWheel();
+
+    if (progress < duration) {
+      requestAnimationFrame(animate);
+    } else {
+      const index = Math.floor(
+        (segments.length - ((rotation % (2 * Math.PI)) / slice)) % segments.length
+      );
+      document.getElementById("result").innerHTML =
+        "🎁 Kamu mendapatkan: <b>" + segments[index].text + "</b>";
+    }
+  }
+  requestAnimationFrame(animate);
+}
+
+drawWheel();
 </script>
 
 </body>
 </html>
-
